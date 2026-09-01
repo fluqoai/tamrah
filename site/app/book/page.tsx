@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/lib/supabase';
+import { BrandLogo } from '@/components/brand-logo';
 
 type Unit = { id: string; title_ar: string; base_price_sar: number; max_guests: number; unit_images: { public_url: string; sort_order: number }[] };
 
@@ -34,7 +35,7 @@ export default function BookingPage() {
 
   return (
     <main dir="rtl" className="min-h-screen bg-background pb-16">
-      <header className="border-b border-border bg-[#fffaf2]"><div className="site-shell flex h-20 items-center justify-between"><Link href="/" className="flex items-center gap-3"><span className="brand-mark">ت</span><strong className="text-xl">تمرة</strong></Link><div className="flex items-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="size-4 text-[#394034]" /> دفع آمن ومشفّر</div></div></header>
+      <header className="border-b border-border bg-[#fffaf2]"><div className="site-shell flex h-20 items-center justify-between"><Link href="/" className="flex items-center gap-3"><BrandLogo/><strong className="text-xl">تمرة</strong></Link><div className="flex items-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="size-4 text-[#394034]" /> دفع آمن ومشفّر</div></div></header>
       <div className="site-shell py-10">
         <Link href="/" className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowRight className="size-4" /> العودة للإقامة</Link>
         <div className="grid gap-8 lg:grid-cols-[1fr_390px]">

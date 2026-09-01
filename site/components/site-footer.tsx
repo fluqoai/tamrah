@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Clock3, Mail, MapPin, MessageCircle } from 'lucide-react';
+import { BrandLogo } from '@/components/brand-logo';
 
 export function SiteFooter({ locale = 'ar' }: { locale?: 'ar' | 'en' }) {
   const ar = locale === 'ar';
@@ -9,7 +10,7 @@ export function SiteFooter({ locale = 'ar' }: { locale?: 'ar' | 'en' }) {
       <div className="site-shell relative py-14 sm:py-16">
         <div className="grid gap-10 border-b border-white/10 pb-12 md:grid-cols-2 lg:grid-cols-[1.25fr_.75fr_.9fr]">
           <div className="max-w-sm">
-            <Link href={ar ? '/' : '/en'} className="flex items-center gap-3 text-white"><span className="brand-mark">{ar ? 'ت' : 'T'}</span><span><strong className="block text-xl">{ar ? 'تمرة' : 'Tamra'}</strong><small className="tracking-wider text-white/45">TAMRA HOSPITALITY</small></span></Link>
+            <Link href={ar ? '/' : '/en'} className="flex items-center gap-3 text-white"><BrandLogo /><span><strong className="block text-xl">{ar ? 'تمرة' : 'Tamra'}</strong><small className="tracking-wider text-white/45">TAMRA HOSPITALITY</small></span></Link>
             <p className="mt-5 text-sm leading-7">{ar ? 'إقامة دافئة ومتكاملة في حي الأصيل شمال جدة، صُممت لتمنحك راحة البيت وخصوصية المكان.' : 'A warm, fully equipped stay in Al Aseel, North Jeddah, designed for comfort and privacy.'}</p>
           </div>
           <div><h3 className="font-semibold text-white">{ar ? 'معلومات الإقامة' : 'Stay information'}</h3><ul className="mt-5 space-y-4 text-sm"><li className="flex gap-3"><MapPin className="mt-0.5 size-4 shrink-0 text-[#d2a867]" />{ar ? 'حي الأصيل، شمال جدة' : 'Al Aseel, North Jeddah'}</li><li className="flex gap-3"><Clock3 className="mt-0.5 size-4 shrink-0 text-[#d2a867]" />{ar ? 'الدخول 4:00 م · الخروج 12:00 م' : 'Check-in 4 PM · Check-out 12 PM'}</li><li><Link className="hover:text-white" href="/policies">{ar ? 'سياسة الحجز والإلغاء' : 'Booking & cancellation policy'}</Link></li></ul></div>

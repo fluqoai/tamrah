@@ -6,6 +6,7 @@ import { BookingSearch } from '@/components/booking-search';
 import { SiteFooter } from '@/components/site-footer';
 import { WhatsappFloat } from '@/components/whatsapp-float';
 import { UnitsShowcase } from '@/components/units-showcase';
+import { BrandLogo } from '@/components/brand-logo';
 
 const highlights = [
   { icon: BedDouble, value: 'غرفتا نوم', caption: 'سرير مزدوج وسريران منفردان' },
@@ -20,7 +21,7 @@ export default function Home() {
       <header className="relative z-20 border-b border-border/70 bg-background/90 backdrop-blur-xl">
         <div className="site-shell flex h-20 items-center justify-between gap-6">
           <Link href="/" className="flex items-center gap-3" aria-label="تمرة - الرئيسية">
-            <span className="brand-mark" aria-hidden="true">ت</span>
+            <BrandLogo />
             <span><strong className="block text-xl leading-none">تمرة</strong><span className="mt-1 block text-[10px] tracking-[0.08em] text-muted-foreground">TAMRA HOSPITALITY</span></span>
           </Link>
           <nav className="hidden items-center gap-8 text-sm lg:flex" aria-label="التنقل الرئيسي">
