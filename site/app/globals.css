@@ -1,0 +1,29 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+@theme inline {
+  --color-background: var(--background); --color-foreground: var(--foreground); --color-card: var(--card); --color-card-foreground: var(--card-foreground); --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground); --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground); --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground); --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground); --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground); --color-destructive: var(--destructive); --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring); --font-sans: var(--font-tamra); --font-heading: var(--font-tamra); --radius-sm: calc(var(--radius) * .6); --radius-md: calc(var(--radius) * .8); --radius-lg: var(--radius); --radius-xl: calc(var(--radius) * 1.4); --radius-2xl: calc(var(--radius) * 1.8); --radius-3xl: calc(var(--radius) * 2.2);
+}
+:root { --background:#f3ebdd; --foreground:#2f211b; --card:#fffaf2; --card-foreground:#2f211b; --popover:#fffaf2; --popover-foreground:#2f211b; --primary:#3b2820; --primary-foreground:#fffaf2; --secondary:#e9ddca; --secondary-foreground:#3b2820; --muted:#ece3d5; --muted-foreground:#786a61; --accent:#b08a52; --accent-foreground:#3b2820; --destructive:#9a3e36; --border:#dacebc; --input:#d7c9b6; --ring:#b08a52; --radius:.85rem; }
+.dark { --background:#241915; --foreground:#f8f0e5; --card:#30221d; --card-foreground:#f8f0e5; --popover:#30221d; --popover-foreground:#f8f0e5; --primary:#d0ad73; --primary-foreground:#241915; --secondary:#394034; --secondary-foreground:#f8f0e5; --muted:#3b2a24; --muted-foreground:#c9b9aa; --accent:#b08a52; --accent-foreground:#241915; --border:#4b3930; --input:#4b3930; --ring:#b08a52; }
+@layer base { * { @apply border-border outline-ring/50; } html { @apply scroll-smooth font-sans; } body { @apply bg-background text-foreground; font-family:var(--font-tamra),Arial,sans-serif; } a { @apply transition-colors; } }
+.site-shell { width:min(100% - 2rem,1380px); margin-inline:auto; }
+.brand-mark { display:grid; place-items:center; width:2.7rem; height:2.7rem; border-radius:999px; color:#f4e5ca; background:#3b2820; border:1px solid #b08a52; box-shadow:inset 0 0 0 3px #3b2820,inset 0 0 0 4px rgb(176 138 82/.5); font-size:1.25rem; font-weight:700; }
+.hero-card { box-shadow:0 28px 80px rgb(59 40 32/18%); }
+.pattern-overlay { background-image:linear-gradient(45deg,transparent 43%,rgba(255,255,255,.2) 44%,transparent 46%),linear-gradient(-45deg,transparent 43%,rgba(255,255,255,.15) 44%,transparent 46%); background-size:46px 46px; }
+.booking-panel { color:#2f211b; }
+.booking-field { display:block; border:1px solid #dfd2c0; border-radius:.85rem; background:rgb(255 255 255/45%); padding:.55rem .75rem; }
+.booking-field>span { display:flex; align-items:center; gap:.4rem; color:#786a61; font-size:.7rem; font-weight:600; }
+.booking-field>span svg { width:.9rem; }
+.booking-field input { border:0; box-shadow:none; padding-inline:0; height:2.25rem; color:#2f211b; }
+.eyebrow { color:#8d6839; font-size:.75rem; font-weight:700; }
+.feature-card { border:1px solid #ded1bf; background:rgb(255 250 242/72%); border-radius:1.35rem; padding:1.5rem; min-height:190px; box-shadow:0 12px 30px rgb(59 40 32/5%); }
+.feature-icon { display:grid; place-items:center; width:2.75rem; height:2.75rem; border-radius:.9rem; color:#f3ebdd; background:#394034; }
+.feature-icon svg { width:1.25rem; }
+.feature-card h3 { margin-top:1.4rem; font-size:1.05rem; font-weight:700; }
+.feature-card p { margin-top:.55rem; color:#786a61; font-size:.78rem; line-height:1.8; }
+.gallery-card { position:relative; min-height:440px; overflow:hidden; border-radius:1.5rem; box-shadow:0 20px 45px rgb(59 40 32/12%); }
+@media (min-width:768px) { .site-shell { width:min(100% - 4rem,1380px); } }
+@media (max-width:640px) { .gallery-card { min-height:360px; } }
