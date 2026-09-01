@@ -29,7 +29,7 @@ export default function Home() {
           <nav className="hidden items-center gap-8 text-sm lg:flex" aria-label="التنقل الرئيسي">
             <Link className="font-semibold text-primary" href="#stay">الإقامة</Link><Link className="text-muted-foreground hover:text-foreground" href="#details">عن المكان</Link><Link className="text-muted-foreground hover:text-foreground" href="#policies">السياسات</Link><Link className="text-muted-foreground hover:text-foreground" href="#contact">تواصل معنا</Link>
           </nav>
-          <div className="flex items-center gap-2"><Button variant="ghost" className="h-10 rounded-full px-3" aria-label="Switch to English"><Languages /> EN</Button><Button variant="outline" size="icon-lg" className="rounded-full lg:hidden" aria-label="فتح القائمة"><Menu /></Button></div>
+          <div className="flex items-center gap-2"><Link href="/en" className="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-medium hover:bg-muted" aria-label="Switch to English"><Languages className="size-4" /> EN</Link><Button variant="outline" size="icon-lg" className="rounded-full lg:hidden" aria-label="فتح القائمة"><Menu /></Button></div>
         </div>
       </header>
 
