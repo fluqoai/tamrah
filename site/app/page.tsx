@@ -3,18 +3,15 @@ import Link from 'next/link';
 import { BedDouble, CarFront, ChevronLeft, Languages, MapPin, Menu, ShieldCheck, Sparkles, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BookingSearch } from '@/components/booking-search';
+import { PropertyGallery } from '@/components/property-gallery';
+import { SiteFooter } from '@/components/site-footer';
+import { WhatsappFloat } from '@/components/whatsapp-float';
 
 const highlights = [
   { icon: BedDouble, value: 'غرفتا نوم', caption: 'سرير مزدوج وسريران منفردان' },
   { icon: Users, value: 'حتى 5 ضيوف', caption: 'مساحة مريحة للعائلة والأصدقاء' },
   { icon: CarFront, value: 'موقف خاص', caption: 'موقف مظلل بجوار السكن' },
   { icon: ShieldCheck, value: 'حجز مؤكد', caption: 'تأكيد فوري وسياسة إلغاء مرنة' },
-];
-
-const gallery = [
-  { src: '/images/living-window.jpeg', alt: 'غرفة المعيشة في شقة تمرة' },
-  { src: '/images/master-window.jpeg', alt: 'غرفة النوم الرئيسية' },
-  { src: '/images/dining.jpeg', alt: 'منطقة الطعام' },
 ];
 
 export default function Home() {
@@ -51,11 +48,13 @@ export default function Home() {
       <section id="details" className="site-shell py-14 sm:py-20">
         <div className="mb-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><span className="eyebrow">تفاصيل الإقامة</span><h2 className="mt-3 text-3xl font-semibold sm:text-5xl">كل ما تحتاجه، في مكان واحد</h2></div><div className="flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="size-4 text-accent" /> حي الأصيل، شمال جدة</div></div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{highlights.map(({ icon: Icon, value, caption }) => <article key={value} className="feature-card"><span className="feature-icon"><Icon /></span><h3>{value}</h3><p>{caption}</p></article>)}</div>
-        <div className="mt-14 grid gap-4 md:grid-cols-3">{gallery.map((image, index) => <figure key={image.src} className={`gallery-card ${index === 0 ? 'md:translate-y-8' : ''}`}><Image src={image.src} alt={image.alt} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition duration-700 hover:scale-105" /></figure>)}</div>
+        <div className="mb-8 mt-16 flex items-end justify-between gap-4"><div><span className="eyebrow">جولة داخل تمرة</span><h2 className="mt-2 text-3xl font-semibold sm:text-4xl">شاهد تفاصيل إقامتك</h2></div><span className="rounded-full border border-border bg-white/40 px-4 py-2 text-xs text-muted-foreground">9 صور</span></div>
+        <PropertyGallery />
       </section>
 
       <section id="policies" className="bg-[#394034] text-[#fffaf1]"><div className="site-shell grid gap-10 py-16 sm:py-20 lg:grid-cols-[1fr_auto] lg:items-center"><div><span className="text-xs font-semibold text-[#d6b170]">حجز بطمأنينة</span><h2 className="mt-3 text-3xl font-semibold sm:text-5xl">خطط براحتك، والباقي علينا</h2><p className="mt-5 max-w-2xl leading-8 text-white/70">إلغاء مجاني قبل الوصول بأكثر من 24 ساعة، وتأكيد فوري بمجرد اكتمال الدفع.</p></div><Button className="h-13 rounded-full bg-[#b08a52] px-8 text-base text-[#251812] hover:bg-[#c39a5d]">ابدأ الحجز <ChevronLeft /></Button></div></section>
-      <footer id="contact" className="bg-[#261a16] text-white/75"><div className="site-shell flex flex-col justify-between gap-8 py-10 sm:flex-row sm:items-center"><div><strong className="text-xl text-white">تمرة</strong><p className="mt-2 text-sm">ضيافتنا... من القلب</p></div><div className="flex flex-wrap gap-5 text-sm"><a href="https://wa.me/966559386212">واتساب 0559386212</a><a href="mailto:fahad999792@gmail.com">fahad999792@gmail.com</a></div></div></footer>
+      <SiteFooter />
+      <WhatsappFloat />
     </main>
   );
 }
