@@ -2,56 +2,718 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Building2, CalendarDays, CalendarOff, CheckCircle2, Eye, EyeOff, Home, ImagePlus, LoaderCircle, LogOut, Mail, MessageCircle, Phone, Plus, Save, Settings2, Users } from 'lucide-react';
+import {
+  Building2,
+  CalendarDays,
+  CalendarOff,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  Home,
+  ImagePlus,
+  LoaderCircle,
+  LogOut,
+  Mail,
+  MessageCircle,
+  Phone,
+  Plus,
+  Save,
+  Settings2,
+  Users,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/lib/supabase';
 import { BrandLogo } from '@/components/brand-logo';
 
 const PROPERTY_ID = 'd9ed2caa-3444-4cb0-b79c-8a01134e4c13';
-type Unit = { id: string; slug: string; title_ar: string; title_en: string; base_price_sar: number; max_guests: number; bedrooms: number; bathrooms: number; is_published: boolean; unit_images: { public_url: string; sort_order: number }[] };
-type Booking = { id: string; booking_reference: string; guest_name: string; guest_email: string; guest_phone: string; guest_count: number; check_in: string; check_out: string; total_sar: number; status: string; units: { title_ar: string } | null };
+type Unit = {
+  id: string;
+  slug: string;
+  title_ar: string;
+  title_en: string;
+  base_price_sar: number;
+  max_guests: number;
+  bedrooms: number;
+  bathrooms: number;
+  is_published: boolean;
+  unit_images: { public_url: string; sort_order: number }[];
+};
+type Booking = {
+  id: string;
+  booking_reference: string;
+  guest_name: string;
+  guest_email: string;
+  guest_phone: string;
+  guest_count: number;
+  check_in: string;
+  check_out: string;
+  total_sar: number;
+  status: string;
+  units: { title_ar: string }[] | null;
+};
 
-function whatsappNumber(phone: string) { const digits = phone.replace(/\D/g, ''); if (digits.startsWith('966')) return digits; if (digits.startsWith('0')) return `966${digits.slice(1)}`; if (digits.startsWith('5')) return `966${digits}`; return digits; }
+function whatsappNumber(phone: string) {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.startsWith('966')) return digits;
+  if (digits.startsWith('0')) return `966${digits.slice(1)}`;
+  if (digits.startsWith('5')) return `966${digits}`;
+  return digits;
+}
 
 export default function AdminPage() {
-  const [sessionReady, setSessionReady] = useState(false); const [signedIn, setSignedIn] = useState(false); const [email, setEmail] = useState('fahad999792@gmail.com'); const [message, setMessage] = useState(''); const [busy, setBusy] = useState(false);
-  const [units, setUnits] = useState<Unit[]>([]); const [selectedUnitId, setSelectedUnitId] = useState(''); const [price, setPrice] = useState('400'); const [bookings, setBookings] = useState<Booking[]>([]); const [block, setBlock] = useState({ start: '', end: '', reason: '' });
-  const [newUnit, setNewUnit] = useState({ titleAr: '', titleEn: '', descriptionAr: '', descriptionEn: '', price: '400', guests: '5', bedrooms: '2', bathrooms: '2' }); const [files, setFiles] = useState<File[]>([]);
+  const [sessionReady, setSessionReady] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
+  const [email, setEmail] = useState('fahad999792@gmail.com');
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [selectedUnitId, setSelectedUnitId] = useState('');
+  const [price, setPrice] = useState('400');
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [block, setBlock] = useState({ start: '', end: '', reason: '' });
+  const [newUnit, setNewUnit] = useState({
+    titleAr: '',
+    titleEn: '',
+    descriptionAr: '',
+    descriptionEn: '',
+    price: '400',
+    guests: '5',
+    bedrooms: '2',
+    bathrooms: '2',
+  });
+  const [files, setFiles] = useState<File[]>([]);
 
   const loadDashboard = useCallback(async () => {
     const [{ data: unitRows }, { data: bookingRows }] = await Promise.all([
-      supabase.from('units').select('id,slug,title_ar,title_en,base_price_sar,max_guests,bedrooms,bathrooms,is_published,unit_images(public_url,sort_order)').order('created_at'),
-      supabase.from('bookings').select('id,booking_reference,guest_name,guest_email,guest_phone,guest_count,check_in,check_out,total_sar,status,units(title_ar)').order('created_at', { ascending: false }).limit(50),
+      supabase
+        .from('units')
+        .select(
+          'id,slug,title_ar,title_en,base_price_sar,max_guests,bedrooms,bathrooms,is_published,unit_images(public_url,sort_order)',
+        )
+        .order('created_at'),
+      supabase
+        .from('bookings')
+        .select(
+          'id,booking_reference,guest_name,guest_email,guest_phone,guest_count,check_in,check_out,total_sar,status,units(title_ar)',
+        )
+        .order('created_at', { ascending: false })
+        .limit(50),
     ]);
-    const nextUnits = (unitRows as Unit[]) ?? []; setUnits(nextUnits); setBookings((bookingRows as Booking[]) ?? []);
-    setSelectedUnitId((current) => { const next = current || nextUnits[0]?.id || ''; const selected = nextUnits.find((unit) => unit.id === next); if (selected) setPrice(String(selected.base_price_sar)); return next; });
+    const nextUnits = (unitRows as Unit[]) ?? [];
+    setUnits(nextUnits);
+    setBookings((bookingRows as Booking[]) ?? []);
+    setSelectedUnitId((current) => {
+      const next = current || nextUnits[0]?.id || '';
+      const selected = nextUnits.find((unit) => unit.id === next);
+      if (selected) setPrice(String(selected.base_price_sar));
+      return next;
+    });
   }, []);
 
-  useEffect(() => { supabase.auth.getSession().then(({ data }) => { const active = Boolean(data.session); setSignedIn(active); setSessionReady(true); if (active) loadDashboard(); }); const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => { setSignedIn(Boolean(session)); if (session) loadDashboard(); }); return () => listener.subscription.unsubscribe(); }, [loadDashboard]);
-  async function sendLogin() { setBusy(true); setMessage(''); const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${window.location.origin}/admin` } }); setBusy(false); setMessage(error ? 'تعذر إرسال رابط الدخول.' : 'أرسلنا رابط دخول آمن إلى البريد. افتحه للمتابعة.'); }
-  function selectUnit(unit: Unit) { setSelectedUnitId(unit.id); setPrice(String(unit.base_price_sar)); }
-  async function savePrice() { if (!selectedUnitId) return; setBusy(true); const { error } = await supabase.from('units').update({ base_price_sar: Number(price), updated_at: new Date().toISOString() }).eq('id', selectedUnitId); setBusy(false); setMessage(error ? 'لم يتم حفظ السعر.' : 'تم تحديث سعر الشقة.'); if (!error) loadDashboard(); }
-  async function blockDates() { if (!selectedUnitId || !block.start || !block.end || block.end <= block.start) { setMessage('اختر شقة وفترة صحيحة للحجب.'); return; } setBusy(true); const { error } = await supabase.from('blocked_dates').insert({ unit_id: selectedUnitId, start_date: block.start, end_date: block.end, reason: block.reason || 'حجب من الإدارة' }); setBusy(false); setMessage(error ? 'تعذر حجب الفترة؛ قد تكون متداخلة.' : 'تم حجب الفترة لهذه الشقة.'); if (!error) setBlock({ start: '', end: '', reason: '' }); }
-  async function togglePublished(unit: Unit) { const { error } = await supabase.from('units').update({ is_published: !unit.is_published, updated_at: new Date().toISOString() }).eq('id', unit.id); setMessage(error ? 'تعذر تغيير حالة النشر.' : unit.is_published ? 'تم إخفاء الشقة من الموقع.' : 'تم نشر الشقة وستظهر في الموقع.'); if (!error) loadDashboard(); }
-  async function addUnit(event: React.FormEvent) {
-    event.preventDefault(); if (!newUnit.titleAr.trim() || !newUnit.titleEn.trim()) { setMessage('أدخل اسم الشقة بالعربية والإنجليزية.'); return; }
-    setBusy(true); setMessage(''); const slug = `tamra-${Date.now()}`;
-    const { data: created, error } = await supabase.from('units').insert({ property_id: PROPERTY_ID, slug, title_ar: newUnit.titleAr.trim(), title_en: newUnit.titleEn.trim(), description_ar: newUnit.descriptionAr.trim(), description_en: newUnit.descriptionEn.trim(), base_price_sar: Number(newUnit.price), max_guests: Number(newUnit.guests), bedrooms: Number(newUnit.bedrooms), bathrooms: Number(newUnit.bathrooms), amenities: ['kitchen','living_room','balcony','private_shaded_parking'], is_published: true }).select('id').single();
-    if (error || !created) { setBusy(false); setMessage('تعذر إضافة الشقة. تأكد من صلاحية حساب المالك.'); return; }
-    let uploadFailed = false;
-    for (let index = 0; index < files.length; index += 1) { const file = files[index]; const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-'); const path = `${created.id}/${crypto.randomUUID()}-${safeName}`; const { error: uploadError } = await supabase.storage.from('unit-images').upload(path, file); if (uploadError) { uploadFailed = true; continue; } const { data: url } = supabase.storage.from('unit-images').getPublicUrl(path); const { error: imageError } = await supabase.from('unit_images').insert({ unit_id: created.id, public_url: url.publicUrl, storage_path: path, alt_ar: newUnit.titleAr, alt_en: newUnit.titleEn, sort_order: index }); if (imageError) uploadFailed = true; }
-    setBusy(false); setMessage(uploadFailed ? 'أضيفت الشقة، لكن تعذر رفع بعض الصور.' : 'تمت إضافة الشقة ونشرها في الموقع.'); setNewUnit({ titleAr: '', titleEn: '', descriptionAr: '', descriptionEn: '', price: '400', guests: '5', bedrooms: '2', bathrooms: '2' }); setFiles([]); loadDashboard();
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      const active = Boolean(data.session);
+      setSignedIn(active);
+      setSessionReady(true);
+      if (active) loadDashboard();
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSignedIn(Boolean(session));
+        if (session) loadDashboard();
+      },
+    );
+    return () => listener.subscription.unsubscribe();
+  }, [loadDashboard]);
+  async function sendLogin() {
+    setBusy(true);
+    setMessage('');
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/admin` },
+    });
+    setBusy(false);
+    setMessage(
+      error
+        ? 'تعذر إرسال رابط الدخول.'
+        : 'أرسلنا رابط دخول آمن إلى البريد. افتحه للمتابعة.',
+    );
   }
-  function sendConfirmation(booking: Booking) { const confirmationUrl = new URL('/confirmation', window.location.origin); confirmationUrl.searchParams.set('ref', booking.booking_reference); confirmationUrl.searchParams.set('checkIn', booking.check_in); confirmationUrl.searchParams.set('checkOut', booking.check_out); const text = `مرحبًا ${booking.guest_name}،\nتم تأكيد حجزك لدى تمرة للضيافة في ${booking.units?.title_ar ?? 'شقة تمرة'}.\nرقم الحجز: ${booking.booking_reference}\nالدخول: ${booking.check_in} الساعة 4:00 م\nالخروج: ${booking.check_out} الساعة 12:00 م\n\nرابط تأكيد الحجز:\n${confirmationUrl.toString()}`; window.open(`https://wa.me/${whatsappNumber(booking.guest_phone)}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer'); }
+  function selectUnit(unit: Unit) {
+    setSelectedUnitId(unit.id);
+    setPrice(String(unit.base_price_sar));
+  }
+  async function savePrice() {
+    if (!selectedUnitId) return;
+    setBusy(true);
+    const { error } = await supabase
+      .from('units')
+      .update({
+        base_price_sar: Number(price),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', selectedUnitId);
+    setBusy(false);
+    setMessage(error ? 'لم يتم حفظ السعر.' : 'تم تحديث سعر الشقة.');
+    if (!error) loadDashboard();
+  }
+  async function blockDates() {
+    if (
+      !selectedUnitId ||
+      !block.start ||
+      !block.end ||
+      block.end <= block.start
+    ) {
+      setMessage('اختر شقة وفترة صحيحة للحجب.');
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase
+      .from('blocked_dates')
+      .insert({
+        unit_id: selectedUnitId,
+        start_date: block.start,
+        end_date: block.end,
+        reason: block.reason || 'حجب من الإدارة',
+      });
+    setBusy(false);
+    setMessage(
+      error ? 'تعذر حجب الفترة؛ قد تكون متداخلة.' : 'تم حجب الفترة لهذه الشقة.',
+    );
+    if (!error) setBlock({ start: '', end: '', reason: '' });
+  }
+  async function togglePublished(unit: Unit) {
+    const { error } = await supabase
+      .from('units')
+      .update({
+        is_published: !unit.is_published,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', unit.id);
+    setMessage(
+      error
+        ? 'تعذر تغيير حالة النشر.'
+        : unit.is_published
+          ? 'تم إخفاء الشقة من الموقع.'
+          : 'تم نشر الشقة وستظهر في الموقع.',
+    );
+    if (!error) loadDashboard();
+  }
+  async function addUnit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!newUnit.titleAr.trim() || !newUnit.titleEn.trim()) {
+      setMessage('أدخل اسم الشقة بالعربية والإنجليزية.');
+      return;
+    }
+    setBusy(true);
+    setMessage('');
+    const slug = `tamra-${Date.now()}`;
+    const { data: created, error } = await supabase
+      .from('units')
+      .insert({
+        property_id: PROPERTY_ID,
+        slug,
+        title_ar: newUnit.titleAr.trim(),
+        title_en: newUnit.titleEn.trim(),
+        description_ar: newUnit.descriptionAr.trim(),
+        description_en: newUnit.descriptionEn.trim(),
+        base_price_sar: Number(newUnit.price),
+        max_guests: Number(newUnit.guests),
+        bedrooms: Number(newUnit.bedrooms),
+        bathrooms: Number(newUnit.bathrooms),
+        amenities: [
+          'kitchen',
+          'living_room',
+          'balcony',
+          'private_shaded_parking',
+        ],
+        is_published: true,
+      })
+      .select('id')
+      .single();
+    if (error || !created) {
+      setBusy(false);
+      setMessage('تعذر إضافة الشقة. تأكد من صلاحية حساب المالك.');
+      return;
+    }
+    let uploadFailed = false;
+    for (let index = 0; index < files.length; index += 1) {
+      const file = files[index];
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
+      const path = `${created.id}/${crypto.randomUUID()}-${safeName}`;
+      const { error: uploadError } = await supabase.storage
+        .from('unit-images')
+        .upload(path, file);
+      if (uploadError) {
+        uploadFailed = true;
+        continue;
+      }
+      const { data: url } = supabase.storage
+        .from('unit-images')
+        .getPublicUrl(path);
+      const { error: imageError } = await supabase
+        .from('unit_images')
+        .insert({
+          unit_id: created.id,
+          public_url: url.publicUrl,
+          storage_path: path,
+          alt_ar: newUnit.titleAr,
+          alt_en: newUnit.titleEn,
+          sort_order: index,
+        });
+      if (imageError) uploadFailed = true;
+    }
+    setBusy(false);
+    setMessage(
+      uploadFailed
+        ? 'أضيفت الشقة، لكن تعذر رفع بعض الصور.'
+        : 'تمت إضافة الشقة ونشرها في الموقع.',
+    );
+    setNewUnit({
+      titleAr: '',
+      titleEn: '',
+      descriptionAr: '',
+      descriptionEn: '',
+      price: '400',
+      guests: '5',
+      bedrooms: '2',
+      bathrooms: '2',
+    });
+    setFiles([]);
+    loadDashboard();
+  }
+  function sendConfirmation(booking: Booking) {
+    const confirmationUrl = new URL('/confirmation', window.location.origin);
+    confirmationUrl.searchParams.set('ref', booking.booking_reference);
+    confirmationUrl.searchParams.set('checkIn', booking.check_in);
+    confirmationUrl.searchParams.set('checkOut', booking.check_out);
+    const text = `مرحبًا ${booking.guest_name}،\nتم تأكيد حجزك لدى تمرة للضيافة في ${booking.units?.[0]?.title_ar ?? 'شقة تمرة'}.\nرقم الحجز: ${booking.booking_reference}\nالدخول: ${booking.check_in} الساعة 4:00 م\nالخروج: ${booking.check_out} الساعة 12:00 م\n\nرابط تأكيد الحجز:\n${confirmationUrl.toString()}`;
+    window.open(
+      `https://wa.me/${whatsappNumber(booking.guest_phone)}?text=${encodeURIComponent(text)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
+  }
 
-  if (!sessionReady) return <main className="grid min-h-screen place-items-center bg-background"><LoaderCircle className="animate-spin text-accent"/></main>;
-  if (!signedIn) return <main dir="rtl" className="grid min-h-screen place-items-center bg-[#3b2820] p-5"><section className="w-full max-w-md rounded-[1.8rem] bg-[#fffaf2] p-7 shadow-2xl"><Link href="/" className="mb-8 flex items-center gap-3"><BrandLogo/><strong className="text-xl">تمرة</strong></Link><span className="eyebrow">للمالك فقط</span><h1 className="mt-2 text-3xl font-semibold">دخول لوحة الإدارة</h1><p className="mt-3 text-sm leading-7 text-muted-foreground">سنرسل رابط دخول لمرة واحدة إلى بريد الإدارة المعتمد.</p><label className="mt-7 block space-y-2"><span className="flex items-center gap-2 text-sm font-semibold"><Mail className="size-4 text-accent"/>البريد الإلكتروني</span><Input dir="ltr" value={email} onChange={(e)=>setEmail(e.target.value)} type="email" className="h-12 bg-white text-right"/></label><Button onClick={sendLogin} disabled={busy} className="mt-4 h-12 w-full">{busy?<LoaderCircle className="animate-spin"/>:'إرسال رابط الدخول'}</Button>{message&&<p className="mt-4 rounded-xl bg-muted p-3 text-xs leading-6">{message}</p>}</section></main>;
+  if (!sessionReady)
+    return (
+      <main className="grid min-h-screen place-items-center bg-background">
+        <LoaderCircle className="animate-spin text-accent" />
+      </main>
+    );
+  if (!signedIn)
+    return (
+      <main
+        dir="rtl"
+        className="grid min-h-screen place-items-center bg-[#3b2820] p-5"
+      >
+        <section className="w-full max-w-md rounded-[1.8rem] bg-[#fffaf2] p-7 shadow-2xl">
+          <Link href="/" className="mb-8 flex items-center gap-3">
+            <BrandLogo />
+            <strong className="text-xl">تمرة</strong>
+          </Link>
+          <span className="eyebrow">للمالك فقط</span>
+          <h1 className="mt-2 text-3xl font-semibold">دخول لوحة الإدارة</h1>
+          <p className="mt-3 text-sm leading-7 text-muted-foreground">
+            سنرسل رابط دخول لمرة واحدة إلى بريد الإدارة المعتمد.
+          </p>
+          <label className="mt-7 block space-y-2">
+            <span className="flex items-center gap-2 text-sm font-semibold">
+              <Mail className="size-4 text-accent" />
+              البريد الإلكتروني
+            </span>
+            <Input
+              dir="ltr"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              className="h-12 bg-white text-right"
+            />
+          </label>
+          <Button
+            onClick={sendLogin}
+            disabled={busy}
+            className="mt-4 h-12 w-full"
+          >
+            {busy ? (
+              <LoaderCircle className="animate-spin" />
+            ) : (
+              'إرسال رابط الدخول'
+            )}
+          </Button>
+          {message && (
+            <p className="mt-4 rounded-xl bg-muted p-3 text-xs leading-6">
+              {message}
+            </p>
+          )}
+        </section>
+      </main>
+    );
 
-  return <main dir="rtl" className="min-h-screen bg-[#eee5d8]"><header className="bg-[#3b2820] text-white"><div className="site-shell flex h-20 items-center justify-between"><Link href="/" className="flex items-center gap-3"><BrandLogo/><div><strong>تمرة</strong><span className="block text-[10px] text-white/60">لوحة المالك</span></div></Link><Button onClick={()=>supabase.auth.signOut()} variant="ghost" className="text-white hover:bg-white/10 hover:text-white"><LogOut/>خروج</Button></div></header><div className="site-shell py-10"><div className="mb-8"><span className="eyebrow">مرحبًا فهد</span><h1 className="mt-2 text-3xl font-semibold sm:text-5xl">الشقق والحجوزات</h1></div>{message&&<div className="mb-6 flex items-center gap-2 rounded-xl bg-[#e1e7dd] p-4 text-sm text-[#394034]"><CheckCircle2 className="size-4"/>{message}</div>}
-    <section className="rounded-2xl border border-border bg-[#fffaf2] p-5 sm:p-6"><div className="flex items-center justify-between"><div><span className="eyebrow">المخزون</span><h2 className="mt-2 text-2xl font-semibold">شقق تمرة</h2><p className="mt-2 text-xs text-muted-foreground">اختر شقة لإدارة سعرها وتواريخها، أو أضف شقة جديدة.</p></div><Building2 className="text-accent"/></div><div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{units.map((unit)=>{const cover=[...(unit.unit_images??[])].sort((a,b)=>a.sort_order-b.sort_order)[0]?.public_url; return <article key={unit.id} className={`overflow-hidden rounded-2xl border bg-white/60 ${selectedUnitId===unit.id?'border-accent ring-2 ring-accent/20':'border-border'}`}><button onClick={()=>selectUnit(unit)} className="w-full text-right"><div className="h-36 bg-[#ded1bf]">{cover&&<img src={cover} alt={unit.title_ar} className="h-full w-full object-cover"/>}</div><div className="p-4"><div className="flex justify-between gap-3"><strong>{unit.title_ar}</strong><span className="text-sm font-bold">{unit.base_price_sar} ر.س</span></div><p className="mt-2 text-xs text-muted-foreground">{unit.bedrooms} غرف · {unit.bathrooms} حمامات · {unit.max_guests} ضيوف</p></div></button><Button onClick={()=>togglePublished(unit)} variant="ghost" className="mb-3 mr-3 h-9 text-xs">{unit.is_published?<><EyeOff/>إخفاء</>:<><Eye/>نشر</>}</Button></article>})}</div></section>
-    <div className="mt-5 grid gap-5 lg:grid-cols-3"><section className="rounded-2xl border border-border bg-[#fffaf2] p-6"><span className="feature-icon"><Settings2/></span><h2 className="mt-5 text-xl font-semibold">سعر الشقة المحددة</h2><div className="mt-5 flex gap-2"><Input dir="ltr" type="number" min="1" value={price} onChange={(e)=>setPrice(e.target.value)} className="h-11 bg-white text-right"/><Button onClick={savePrice} disabled={busy||!selectedUnitId} className="h-11"><Save/>حفظ</Button></div></section><section className="rounded-2xl border border-border bg-[#fffaf2] p-6 lg:col-span-2"><span className="feature-icon"><CalendarOff/></span><h2 className="mt-5 text-xl font-semibold">حجب تواريخ للشقة المحددة</h2><div className="mt-5 grid gap-3 sm:grid-cols-3"><Input type="date" value={block.start} onChange={(e)=>setBlock({...block,start:e.target.value})} className="h-11 bg-white"/><Input type="date" value={block.end} onChange={(e)=>setBlock({...block,end:e.target.value})} className="h-11 bg-white"/><Input value={block.reason} onChange={(e)=>setBlock({...block,reason:e.target.value})} placeholder="السبب (اختياري)" className="h-11 bg-white"/></div><Button onClick={blockDates} disabled={busy||!selectedUnitId} className="mt-3 h-11">حجب الفترة</Button></section></div>
-    <section className="mt-5 rounded-2xl border border-border bg-[#fffaf2] p-5 sm:p-6"><div className="flex items-center gap-3"><span className="feature-icon"><Plus/></span><div><h2 className="text-xl font-semibold">إضافة شقة جديدة</h2><p className="mt-1 text-xs text-muted-foreground">بعد الحفظ ستظهر تلقائيًا ضمن إقامات تمرة.</p></div></div><form onSubmit={addUnit} className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><Input required value={newUnit.titleAr} onChange={(e)=>setNewUnit({...newUnit,titleAr:e.target.value})} placeholder="اسم الشقة بالعربية" className="h-11 bg-white"/><Input required dir="ltr" value={newUnit.titleEn} onChange={(e)=>setNewUnit({...newUnit,titleEn:e.target.value})} placeholder="English name" className="h-11 bg-white text-left"/><Input type="number" min="1" value={newUnit.price} onChange={(e)=>setNewUnit({...newUnit,price:e.target.value})} placeholder="السعر" className="h-11 bg-white"/><Input type="number" min="1" value={newUnit.guests} onChange={(e)=>setNewUnit({...newUnit,guests:e.target.value})} placeholder="عدد الضيوف" className="h-11 bg-white"/><Input type="number" min="0" value={newUnit.bedrooms} onChange={(e)=>setNewUnit({...newUnit,bedrooms:e.target.value})} placeholder="غرف النوم" className="h-11 bg-white"/><Input type="number" min="0" value={newUnit.bathrooms} onChange={(e)=>setNewUnit({...newUnit,bathrooms:e.target.value})} placeholder="الحمامات" className="h-11 bg-white"/><Input value={newUnit.descriptionAr} onChange={(e)=>setNewUnit({...newUnit,descriptionAr:e.target.value})} placeholder="وصف مختصر بالعربية" className="h-11 bg-white lg:col-span-2"/><Input dir="ltr" value={newUnit.descriptionEn} onChange={(e)=>setNewUnit({...newUnit,descriptionEn:e.target.value})} placeholder="Short English description" className="h-11 bg-white text-left lg:col-span-2"/><label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border border-dashed border-accent/60 bg-[#f7efe3] px-4 text-sm lg:col-span-2"><ImagePlus className="size-5 text-accent"/><span>{files.length?`${files.length} صور مختارة`:'اختر صور الشقة (يمكن اختيار عدة صور)'}</span><input type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" onChange={(e)=>setFiles(Array.from(e.target.files??[]))}/></label><Button type="submit" disabled={busy} className="h-12 lg:col-span-2">{busy?<LoaderCircle className="animate-spin"/>:<><Plus/>إضافة الشقة ونشرها</>}</Button></form></section>
-    <section className="mt-5 rounded-2xl border border-border bg-[#fffaf2] p-5 sm:p-6"><div className="flex items-center justify-between"><div><span className="eyebrow">آخر الطلبات</span><h2 className="mt-2 text-2xl font-semibold">الحجوزات</h2></div><Home className="text-accent"/></div>{bookings.length===0?<div className="mt-8 rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">لا توجد حجوزات حتى الآن.</div>:<div className="mt-6 grid gap-4 xl:grid-cols-2">{bookings.map((booking)=><article key={booking.id} className="rounded-2xl border border-border bg-white/55 p-5"><div className="flex flex-wrap items-start justify-between gap-3"><div><span className="font-mono text-xs text-muted-foreground">{booking.booking_reference}</span><h3 className="mt-1 text-lg font-semibold">{booking.guest_name}</h3><p className="text-xs text-accent">{booking.units?.title_ar}</p></div><span className="rounded-full bg-[#e2e8de] px-3 py-1 text-xs font-semibold text-[#394034]">{booking.status}</span></div><div className="mt-5 grid gap-3 text-sm sm:grid-cols-2"><a dir="ltr" href={`tel:${booking.guest_phone}`} className="flex items-center justify-end gap-2 rounded-xl bg-[#f3ebdd] p-3"><span>{booking.guest_phone}</span><Phone className="size-4 text-accent"/></a><a dir="ltr" href={`mailto:${booking.guest_email}`} className="flex items-center justify-end gap-2 overflow-hidden rounded-xl bg-[#f3ebdd] p-3"><span className="truncate">{booking.guest_email}</span><Mail className="size-4 shrink-0 text-accent"/></a><span className="flex items-center gap-2"><CalendarDays className="size-4 text-accent"/>{booking.check_in} ← {booking.check_out}</span><span className="flex items-center gap-2"><Users className="size-4 text-accent"/>{booking.guest_count} ضيوف · {booking.total_sar} ر.س</span></div><Button onClick={()=>sendConfirmation(booking)} className="mt-5 h-11 w-full bg-[#1f9d55] text-white hover:bg-[#168447]"><MessageCircle/>إرسال رابط التأكيد عبر واتساب</Button></article>)}</div>}</section>
-  </div></main>;
+  return (
+    <main dir="rtl" className="min-h-screen bg-[#eee5d8]">
+      <header className="bg-[#3b2820] text-white">
+        <div className="site-shell flex h-20 items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <BrandLogo />
+            <div>
+              <strong>تمرة</strong>
+              <span className="block text-[10px] text-white/60">
+                لوحة المالك
+              </span>
+            </div>
+          </Link>
+          <Button
+            onClick={() => supabase.auth.signOut()}
+            variant="ghost"
+            className="text-white hover:bg-white/10 hover:text-white"
+          >
+            <LogOut />
+            خروج
+          </Button>
+        </div>
+      </header>
+      <div className="site-shell py-10">
+        <div className="mb-8">
+          <span className="eyebrow">مرحبًا فهد</span>
+          <h1 className="mt-2 text-3xl font-semibold sm:text-5xl">
+            الشقق والحجوزات
+          </h1>
+        </div>
+        {message && (
+          <div className="mb-6 flex items-center gap-2 rounded-xl bg-[#e1e7dd] p-4 text-sm text-[#394034]">
+            <CheckCircle2 className="size-4" />
+            {message}
+          </div>
+        )}
+        <section className="rounded-2xl border border-border bg-[#fffaf2] p-5 sm:p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="eyebrow">المخزون</span>
+              <h2 className="mt-2 text-2xl font-semibold">شقق تمرة</h2>
+              <p className="mt-2 text-xs text-muted-foreground">
+                اختر شقة لإدارة سعرها وتواريخها، أو أضف شقة جديدة.
+              </p>
+            </div>
+            <Building2 className="text-accent" />
+          </div>
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {units.map((unit) => {
+              const cover = [...(unit.unit_images ?? [])].sort(
+                (a, b) => a.sort_order - b.sort_order,
+              )[0]?.public_url;
+              return (
+                <article
+                  key={unit.id}
+                  className={`overflow-hidden rounded-2xl border bg-white/60 ${selectedUnitId === unit.id ? 'border-accent ring-2 ring-accent/20' : 'border-border'}`}
+                >
+                  <button
+                    onClick={() => selectUnit(unit)}
+                    className="w-full text-right"
+                  >
+                    <div className="h-36 bg-[#ded1bf]">
+                      {cover && (
+                        <img
+                          src={cover}
+                          alt={unit.title_ar}
+                          className="h-full w-full object-cover"
+                        />
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <div className="flex justify-between gap-3">
+                        <strong>{unit.title_ar}</strong>
+                        <span className="text-sm font-bold">
+                          {unit.base_price_sar} ر.س
+                        </span>
+                      </div>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        {unit.bedrooms} غرف · {unit.bathrooms} حمامات ·{' '}
+                        {unit.max_guests} ضيوف
+                      </p>
+                    </div>
+                  </button>
+                  <Button
+                    onClick={() => togglePublished(unit)}
+                    variant="ghost"
+                    className="mb-3 mr-3 h-9 text-xs"
+                  >
+                    {unit.is_published ? (
+                      <>
+                        <EyeOff />
+                        إخفاء
+                      </>
+                    ) : (
+                      <>
+                        <Eye />
+                        نشر
+                      </>
+                    )}
+                  </Button>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+        <div className="mt-5 grid gap-5 lg:grid-cols-3">
+          <section className="rounded-2xl border border-border bg-[#fffaf2] p-6">
+            <span className="feature-icon">
+              <Settings2 />
+            </span>
+            <h2 className="mt-5 text-xl font-semibold">سعر الشقة المحددة</h2>
+            <div className="mt-5 flex gap-2">
+              <Input
+                dir="ltr"
+                type="number"
+                min="1"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="h-11 bg-white text-right"
+              />
+              <Button
+                onClick={savePrice}
+                disabled={busy || !selectedUnitId}
+                className="h-11"
+              >
+                <Save />
+                حفظ
+              </Button>
+            </div>
+          </section>
+          <section className="rounded-2xl border border-border bg-[#fffaf2] p-6 lg:col-span-2">
+            <span className="feature-icon">
+              <CalendarOff />
+            </span>
+            <h2 className="mt-5 text-xl font-semibold">
+              حجب تواريخ للشقة المحددة
+            </h2>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <Input
+                type="date"
+                value={block.start}
+                onChange={(e) => setBlock({ ...block, start: e.target.value })}
+                className="h-11 bg-white"
+              />
+              <Input
+                type="date"
+                value={block.end}
+                onChange={(e) => setBlock({ ...block, end: e.target.value })}
+                className="h-11 bg-white"
+              />
+              <Input
+                value={block.reason}
+                onChange={(e) => setBlock({ ...block, reason: e.target.value })}
+                placeholder="السبب (اختياري)"
+                className="h-11 bg-white"
+              />
+            </div>
+            <Button
+              onClick={blockDates}
+              disabled={busy || !selectedUnitId}
+              className="mt-3 h-11"
+            >
+              حجب الفترة
+            </Button>
+          </section>
+        </div>
+        <section className="mt-5 rounded-2xl border border-border bg-[#fffaf2] p-5 sm:p-6">
+          <div className="flex items-center gap-3">
+            <span className="feature-icon">
+              <Plus />
+            </span>
+            <div>
+              <h2 className="text-xl font-semibold">إضافة شقة جديدة</h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                بعد الحفظ ستظهر تلقائيًا ضمن إقامات تمرة.
+              </p>
+            </div>
+          </div>
+          <form
+            onSubmit={addUnit}
+            className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            <Input
+              required
+              value={newUnit.titleAr}
+              onChange={(e) =>
+                setNewUnit({ ...newUnit, titleAr: e.target.value })
+              }
+              placeholder="اسم الشقة بالعربية"
+              className="h-11 bg-white"
+            />
+            <Input
+              required
+              dir="ltr"
+              value={newUnit.titleEn}
+              onChange={(e) =>
+                setNewUnit({ ...newUnit, titleEn: e.target.value })
+              }
+              placeholder="English name"
+              className="h-11 bg-white text-left"
+            />
+            <Input
+              type="number"
+              min="1"
+              value={newUnit.price}
+              onChange={(e) =>
+                setNewUnit({ ...newUnit, price: e.target.value })
+              }
+              placeholder="السعر"
+              className="h-11 bg-white"
+            />
+            <Input
+              type="number"
+              min="1"
+              value={newUnit.guests}
+              onChange={(e) =>
+                setNewUnit({ ...newUnit, guests: e.target.value })
+              }
+              placeholder="عدد الضيوف"
+              className="h-11 bg-white"
+            />
+            <Input
+              type="number"
+              min="0"
+              value={newUnit.bedrooms}
+              onChange={(e) =>
+                setNewUnit({ ...newUnit, bedrooms: e.target.value })
+              }
+              placeholder="غرف النوم"
+              className="h-11 bg-white"
+            />
+            <Input
+              type="number"
+              min="0"
+              value={newUnit.bathrooms}
+              onChange={(e) =>
+                setNewUnit({ ...newUnit, bathrooms: e.target.value })
+              }
+              placeholder="الحمامات"
+              className="h-11 bg-white"
+            />
+            <Input
+              value={newUnit.descriptionAr}
+              onChange={(e) =>
+                setNewUnit({ ...newUnit, descriptionAr: e.target.value })
+              }
+              placeholder="وصف مختصر بالعربية"
+              className="h-11 bg-white lg:col-span-2"
+            />
+            <Input
+              dir="ltr"
+              value={newUnit.descriptionEn}
+              onChange={(e) =>
+                setNewUnit({ ...newUnit, descriptionEn: e.target.value })
+              }
+              placeholder="Short English description"
+              className="h-11 bg-white text-left lg:col-span-2"
+            />
+            <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border border-dashed border-accent/60 bg-[#f7efe3] px-4 text-sm lg:col-span-2">
+              <ImagePlus className="size-5 text-accent" />
+              <span>
+                {files.length
+                  ? `${files.length} صور مختارة`
+                  : 'اختر صور الشقة (يمكن اختيار عدة صور)'}
+              </span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                className="sr-only"
+                onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
+              />
+            </label>
+            <Button
+              type="submit"
+              disabled={busy}
+              className="h-12 lg:col-span-2"
+            >
+              {busy ? (
+                <LoaderCircle className="animate-spin" />
+              ) : (
+                <>
+                  <Plus />
+                  إضافة الشقة ونشرها
+                </>
+              )}
+            </Button>
+          </form>
+        </section>
+        <section className="mt-5 rounded-2xl border border-border bg-[#fffaf2] p-5 sm:p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="eyebrow">آخر الطلبات</span>
+              <h2 className="mt-2 text-2xl font-semibold">الحجوزات</h2>
+            </div>
+            <Home className="text-accent" />
+          </div>
+          {bookings.length === 0 ? (
+            <div className="mt-8 rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+              لا توجد حجوزات حتى الآن.
+            </div>
+          ) : (
+            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+              {bookings.map((booking) => (
+                <article
+                  key={booking.id}
+                  className="rounded-2xl border border-border bg-white/55 p-5"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {booking.booking_reference}
+                      </span>
+                      <h3 className="mt-1 text-lg font-semibold">
+                        {booking.guest_name}
+                      </h3>
+                      <p className="text-xs text-accent">
+                        {booking.units?.[0]?.title_ar}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-[#e2e8de] px-3 py-1 text-xs font-semibold text-[#394034]">
+                      {booking.status}
+                    </span>
+                  </div>
+                  <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
+                    <a
+                      dir="ltr"
+                      href={`tel:${booking.guest_phone}`}
+                      className="flex items-center justify-end gap-2 rounded-xl bg-[#f3ebdd] p-3"
+                    >
+                      <span>{booking.guest_phone}</span>
+                      <Phone className="size-4 text-accent" />
+                    </a>
+                    <a
+                      dir="ltr"
+                      href={`mailto:${booking.guest_email}`}
+                      className="flex items-center justify-end gap-2 overflow-hidden rounded-xl bg-[#f3ebdd] p-3"
+                    >
+                      <span className="truncate">{booking.guest_email}</span>
+                      <Mail className="size-4 shrink-0 text-accent" />
+                    </a>
+                    <span className="flex items-center gap-2">
+                      <CalendarDays className="size-4 text-accent" />
+                      {booking.check_in} ← {booking.check_out}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <Users className="size-4 text-accent" />
+                      {booking.guest_count} ضيوف · {booking.total_sar} ر.س
+                    </span>
+                  </div>
+                  <Button
+                    onClick={() => sendConfirmation(booking)}
+                    className="mt-5 h-11 w-full bg-[#1f9d55] text-white hover:bg-[#168447]"
+                  >
+                    <MessageCircle />
+                    إرسال رابط التأكيد عبر واتساب
+                  </Button>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </main>
+  );
 }

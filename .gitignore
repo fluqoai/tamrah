@@ -4,3 +4,5 @@ site/.env.local
 site/supabase/.temp/
 Userskhayrat.git-credentials-safecredentials
 generated-assets/
+
+.vercel
