@@ -6,6 +6,7 @@ import { BookingSearch } from '@/components/booking-search';
 import { PropertyGallery } from '@/components/property-gallery';
 import { SiteFooter } from '@/components/site-footer';
 import { WhatsappFloat } from '@/components/whatsapp-float';
+import { UnitsShowcase } from '@/components/units-showcase';
 
 const highlights = [
   { icon: BedDouble, value: 'غرفتا نوم', caption: 'سرير مزدوج وسريران منفردان' },
@@ -26,7 +27,7 @@ export default function Home() {
           <nav className="hidden items-center gap-8 text-sm lg:flex" aria-label="التنقل الرئيسي">
             <Link className="font-semibold text-primary" href="#stay">الإقامة</Link><Link className="text-muted-foreground hover:text-foreground" href="#details">عن المكان</Link><Link className="text-muted-foreground hover:text-foreground" href="#policies">السياسات</Link><Link className="text-muted-foreground hover:text-foreground" href="#contact">تواصل معنا</Link>
           </nav>
-          <div className="flex items-center gap-2"><Link href="/en" className="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-medium hover:bg-muted" aria-label="Switch to English"><Languages className="size-4" /> EN</Link><Button variant="outline" size="icon-lg" className="rounded-full lg:hidden" aria-label="فتح القائمة"><Menu /></Button></div>
+          <div className="flex items-center gap-2"><Link href="/en" className="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-medium hover:bg-muted" aria-label="Switch to English"><Languages className="size-4" /> EN</Link><details className="group relative lg:hidden"><summary className="flex size-11 cursor-pointer list-none items-center justify-center rounded-full border border-border bg-transparent" aria-label="فتح القائمة"><Menu className="size-5"/></summary><nav className="absolute left-0 top-13 z-50 grid min-w-48 gap-1 rounded-2xl border border-border bg-[#fffaf2] p-2 text-sm shadow-xl"><a className="rounded-xl px-4 py-3 hover:bg-muted" href="#stays">الإقامات</a><a className="rounded-xl px-4 py-3 hover:bg-muted" href="#details">عن المكان</a><a className="rounded-xl px-4 py-3 hover:bg-muted" href="#policies">السياسات</a><a className="rounded-xl px-4 py-3 hover:bg-muted" href="#contact">تواصل معنا</a></nav></details></div>
         </div>
       </header>
 
@@ -45,6 +46,8 @@ export default function Home() {
         </div>
       </section>
 
+      <UnitsShowcase />
+
       <section id="details" className="site-shell py-14 sm:py-20">
         <div className="mb-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><span className="eyebrow">تفاصيل الإقامة</span><h2 className="mt-3 text-3xl font-semibold sm:text-5xl">كل ما تحتاجه، في مكان واحد</h2></div><div className="flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="size-4 text-accent" /> حي الأصيل، شمال جدة</div></div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{highlights.map(({ icon: Icon, value, caption }) => <article key={value} className="feature-card"><span className="feature-icon"><Icon /></span><h3>{value}</h3><p>{caption}</p></article>)}</div>
@@ -52,7 +55,7 @@ export default function Home() {
         <PropertyGallery />
       </section>
 
-      <section id="policies" className="bg-[#394034] text-[#fffaf1]"><div className="site-shell grid gap-10 py-16 sm:py-20 lg:grid-cols-[1fr_auto] lg:items-center"><div><span className="text-xs font-semibold text-[#d6b170]">حجز بطمأنينة</span><h2 className="mt-3 text-3xl font-semibold sm:text-5xl">خطط براحتك، والباقي علينا</h2><p className="mt-5 max-w-2xl leading-8 text-white/70">إلغاء مجاني قبل الوصول بأكثر من 24 ساعة، وتأكيد فوري بمجرد اكتمال الدفع.</p></div><Button className="h-13 rounded-full bg-[#b08a52] px-8 text-base text-[#251812] hover:bg-[#c39a5d]">ابدأ الحجز <ChevronLeft /></Button></div></section>
+      <section id="policies" className="bg-[#394034] text-[#fffaf1]"><div className="site-shell grid gap-10 py-16 sm:py-20 lg:grid-cols-[1fr_auto] lg:items-center"><div><span className="text-xs font-semibold text-[#d6b170]">حجز بطمأنينة</span><h2 className="mt-3 text-3xl font-semibold sm:text-5xl">خطط براحتك، والباقي علينا</h2><p className="mt-5 max-w-2xl leading-8 text-white/70">إلغاء مجاني قبل الوصول بأكثر من 24 ساعة، وتأكيد فوري بمجرد اكتمال الدفع.</p></div><a href="#stays" className="inline-flex h-13 items-center justify-center gap-2 rounded-full bg-[#b08a52] px-8 text-base font-semibold text-[#251812] hover:bg-[#c39a5d]">ابدأ الحجز <ChevronLeft /></a></div></section>
       <SiteFooter />
       <WhatsappFloat />
     </main>
