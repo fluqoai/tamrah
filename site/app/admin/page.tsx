@@ -11,6 +11,7 @@ import {
   EyeOff,
   Home,
   ImagePlus,
+  LockKeyhole,
   LoaderCircle,
   LogOut,
   Mail,
@@ -65,6 +66,7 @@ export default function AdminPage() {
   const [sessionReady, setSessionReady] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [email, setEmail] = useState('fahad999792@gmail.com');
+  const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [units, setUnits] = useState<Unit[]>([]);
@@ -126,19 +128,18 @@ export default function AdminPage() {
     );
     return () => listener.subscription.unsubscribe();
   }, [loadDashboard]);
-  async function sendLogin() {
+  async function signIn(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setBusy(true);
     setMessage('');
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/admin` },
+      password,
     });
     setBusy(false);
-    setMessage(
-      error
-        ? 'تعذر إرسال رابط الدخول.'
-        : 'أرسلنا رابط دخول آمن إلى البريد. افتحه للمتابعة.',
-    );
+    if (error) {
+      setMessage('البريد الإلكتروني أو كلمة المرور غير صحيحة.');
+    }
   }
   function selectUnit(unit: Unit) {
     setSelectedUnitId(unit.id);
@@ -316,32 +317,47 @@ export default function AdminPage() {
           <span className="eyebrow">للمالك فقط</span>
           <h1 className="mt-2 text-3xl font-semibold">دخول لوحة الإدارة</h1>
           <p className="mt-3 text-sm leading-7 text-muted-foreground">
-            سنرسل رابط دخول لمرة واحدة إلى بريد الإدارة المعتمد.
+            أدخل بيانات حساب المالك للوصول إلى الشقق والحجوزات.
           </p>
-          <label className="mt-7 block space-y-2">
-            <span className="flex items-center gap-2 text-sm font-semibold">
-              <Mail className="size-4 text-accent" />
-              البريد الإلكتروني
-            </span>
-            <Input
-              dir="ltr"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              className="h-12 bg-white text-right"
-            />
-          </label>
-          <Button
-            onClick={sendLogin}
-            disabled={busy}
-            className="mt-4 h-12 w-full"
-          >
-            {busy ? (
-              <LoaderCircle className="animate-spin" />
-            ) : (
-              'إرسال رابط الدخول'
-            )}
-          </Button>
+          <form onSubmit={signIn} className="mt-7 space-y-4">
+            <label className="block space-y-2">
+              <span className="flex items-center gap-2 text-sm font-semibold">
+                <Mail className="size-4 text-accent" />
+                البريد الإلكتروني
+              </span>
+              <Input
+                dir="ltr"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                autoComplete="username"
+                required
+                className="h-12 bg-white text-left"
+              />
+            </label>
+            <label className="block space-y-2">
+              <span className="flex items-center gap-2 text-sm font-semibold">
+                <LockKeyhole className="size-4 text-accent" />
+                كلمة المرور
+              </span>
+              <Input
+                dir="ltr"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type="password"
+                autoComplete="current-password"
+                required
+                className="h-12 bg-white text-left"
+              />
+            </label>
+            <Button type="submit" disabled={busy} className="h-12 w-full">
+              {busy ? (
+                <LoaderCircle className="animate-spin" />
+              ) : (
+                'دخول لوحة الإدارة'
+              )}
+            </Button>
+          </form>
           {message && (
             <p className="mt-4 rounded-xl bg-muted p-3 text-xs leading-6">
               {message}
